@@ -1,32 +1,10 @@
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*
+import javax.swing.*;
 import java.util.ArrayList;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 /**
- * TODO:
- * 		1. Add to Expression Reader
- * 			a. inverse
- * 			b. power
- * 			c. 
- * 		2. Allow uni-matrix operations in Expression Reader
- * 		3. 
- * 
- * 
+ * User Interface built with JFrame
  */
-
-
 public class Calculator extends JFrame {
 
 	/** JPanels */
@@ -83,8 +61,13 @@ public class Calculator extends JFrame {
 	/** Insets */
 	private Insets defaultInsets;
 	private Insets multiMatrixInsets;
+	
+	/** Expression Reader */
+	private ExpressionReader er;
 
 	public Calculator() {
+		er = new ExpressionReader();
+		
 		initComponents();
 		updateGUI();
 
@@ -95,6 +78,9 @@ public class Calculator extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
+	/**
+	 * Initializes the buttons and text fields in the UI
+	 */
 	private void initComponents() {
 		panelMain = new JPanel();
 		getContentPane().add(panelMain);
@@ -374,6 +360,9 @@ public class Calculator extends JFrame {
 		multiMatrixInsets = new Insets(0, 8, 0, 8);
 	}
 
+	/**
+	 * Re-Builds the UI after a change
+	 */
 	private void updateGUI() {
 		panelForm.removeAll();
 		if(matrixArows*matrixAcols != matrixAInputFields.size()) throw new IllegalArgumentException();
@@ -516,6 +505,10 @@ public class Calculator extends JFrame {
 		pack();
 	}
 
+	/**
+	 * Returns a Matrix object representing the elements in matrix A's fields
+	 * in the UI
+	 */
 	public Matrix getMatrixA() {
 		double[][] m = new double[matrixAcols][matrixArows];
 		for(int row = 0; row < matrixArows; row++) {
@@ -531,6 +524,10 @@ public class Calculator extends JFrame {
 		return new Matrix(m);
 	}
 
+	/**
+	 * Returns a Matrix object representing the elements in matrix B's fields
+	 * in the UI
+	 */
 	public Matrix getMatrixB() {
 		double[][] m = new double[matrixBcols][matrixBrows];
 		for(int row = 0; row < matrixBrows; row++) {
@@ -546,6 +543,9 @@ public class Calculator extends JFrame {
 		return new Matrix(m);
 	}
 
+	/**
+	 * Checks if the text fields in matrix A are numbers
+	 */
 	public boolean checkMatrixA() {
 		for(JTextField f : matrixAInputFields) {
 			try {
@@ -557,6 +557,9 @@ public class Calculator extends JFrame {
 		return true;
 	}
 
+	/**
+	 * Checks if the text fields in matrix B are numbers
+	 */
 	public boolean checkMatrixB() {
 		for(JTextField f : matrixBInputFields) {
 			try {
@@ -568,6 +571,9 @@ public class Calculator extends JFrame {
 		return true;
 	}
 
+	/**
+	 * Adds a horizontal gap to the GridBagLayout of size n
+	 */
 	public void addHorizontalGap(int n, GridBagConstraints c) {
 		if(n < 1) return;
 		for(int i = 1; i < n; i++) {
@@ -577,6 +583,9 @@ public class Calculator extends JFrame {
 		panelForm.add(new JLabel(" "));
 	}
 
+	/**
+	 * Adds a vertical gap to the GridBagLayout of size n
+	 */
 	public void addVerticalGap(int n, GridBagConstraints c) {
 		if(n < 1) return;
 		for(int i = 0; i < n; i++) {
@@ -586,7 +595,12 @@ public class Calculator extends JFrame {
 		panelForm.add(new JLabel(" "));
 	}
 	
+	/**
+	 * Reads the expression in the manual expression field and displays the
+	 * solution (if one exists)
+	 */
 	public void readManualExpression(String expression) {
+		// Check expression arguments
 		if(expression == null || expression.trim().equals("")) {
 			displayErrorMessage("Please input a valid expression");
 			return;
@@ -596,9 +610,9 @@ public class Calculator extends JFrame {
 			return;
 		}
 		
-		ExpressionReader er;
+		// Read expression
 		try{
-			er = new ExpressionReader(expression, getMatrixA(), getMatrixB());
+			er.inputExpression(expression, getMatrixA(), getMatrixB());
 			Object soln = er.getSolution();
 			if(soln instanceof Double) displaySolution((Double) soln);
 			else if(soln instanceof Matrix) displaySolution((Matrix) soln);
@@ -607,18 +621,30 @@ public class Calculator extends JFrame {
 		}
 	}
 	
+	/**
+	 * Displays a given error message to the user
+	 */
 	public void displayErrorMessage(String message) {
 		JOptionPane.showMessageDialog(null, message);
 	}
 
+	/**
+	 * Displays a given Matrix solution to the user
+	 */
 	public void displaySolution(Matrix solution) {
 		JOptionPane.showMessageDialog(null, solution.toString());
 	}
 
+	/**
+	 * Displays a given number solution to the user
+	 */
 	public void displaySolution(double solution) {
 		JOptionPane.showMessageDialog(null, solution);
 	}
 
+	/**
+	 * Sets a given button's size to height h and width w
+	 */
 	public void setButtonSize(JButton b, int h, int w) {
 		b.setMaximumSize(new Dimension(h, w));
 		b.setMinimumSize(new Dimension(h, w));

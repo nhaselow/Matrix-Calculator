@@ -6,11 +6,21 @@ public class ExpressionReader {
 	Matrix a, b;
 	Object solution;
 
-	public ExpressionReader(String expression, Matrix a, Matrix b) {
+	/**
+	 * Constructs ExpressionReader object
+	 */
+	public ExpressionReader() {}
+
+	/**
+	 * Inputs a given expression with two given matrices. Reads the expression
+	 * and records a solution.
+	 */
+	public void inputExpression(String expression, Matrix a, Matrix b) {
 		if(a == null || b == null) return;
 		expression = expression.replaceAll("\\s+", "");
 		for(Character c : expression.trim().toCharArray())
-			if(!(isOperator(c.toString()) || isNumber(c.toString()) || isMatrix(c.toString()) || c == '(' || c == ')')) {
+			if(!(isOperator(c.toString()) || isNumber(c.toString()) 
+				|| isMatrix(c.toString()) || c == '(' || c == ')')) {
 				throw new IllegalArgumentException(INVALID_CHARACTER_MESSAGE);
 			}
 		if(characterCount(expression, '(') > characterCount(expression, ')'))
@@ -23,11 +33,17 @@ public class ExpressionReader {
 		
 		read(  toReversePolishNotation( addSpaces(expression) )  );
 	}
-
+	
+	/**
+	 * Returns the solution to the previously inputted expression
+	 */
 	public Object getSolution() {
 		return solution;
 	}
 
+	/**
+	 * Adds a space between each element in the given expression
+	 */
 	private String addSpaces(String expr) {
 		String output = "";
 		String prev = " ";
@@ -43,6 +59,9 @@ public class ExpressionReader {
 		return output;
 	}
 
+	/**
+	 * Converts the given expression to reverse polish notation
+	 */
 	private String toReversePolishNotation(String expr) {
 		String output = "";
 		Stack<String> operatorStack = new Stack<String>();
@@ -78,6 +97,10 @@ public class ExpressionReader {
 		return output;
 	}
 
+	/**
+	 * Reads a given expression in reverse polish notation and records the
+	 * solution to this expression.
+	 */
 	private void read(String rpn) {
 		Stack<Object> stack = new Stack<Object>();
 		Object val1, val2;
@@ -146,10 +169,16 @@ public class ExpressionReader {
 		solution = stack.pop();
 	}
 
+	/**
+	 * Checks if two expression elements are of the same type.
+	 */
 	private boolean areSameType(String s1, String s2) {
 		return((isMatrix(s1) && isMatrix(s2)) || (isOperator(s1) && isOperator(s2)) || (isNumber(s1) && isNumber(s2)));
 	}
 
+	/**
+	 * Returns the mathematical precedent of a given element in an expression
+	 */
 	private int getPrecidence(String s) {
 		if(s.equals("+") || s.equals("-")) return 1;
 		else if(s.equals("*") || s.equals("/")) return 2;
@@ -157,10 +186,16 @@ public class ExpressionReader {
 		else return 0;
 	}
 
+	/**
+	 * Determines if a given element is an operator
+	 */
 	private boolean isOperator(String s) {
 		return (s.equals("+") || s.equals("-") || s.equals("*") || s.equals("/") || s.equals("^"));
 	}
 
+	/**
+	 * Determines if a given element (String) is a number
+	 */
 	private boolean isNumber(String s) {
 		try {
 			Double.parseDouble(s);
@@ -170,23 +205,34 @@ public class ExpressionReader {
 		return true;
 	}
 
-	//TODO: this method is pretty shitty
+	/**
+	 * Determines if a given element (Object) is a number
+	 */
 	private boolean isNumber(Object o) {
 		if(o instanceof String) return isNumber((String) o);
 		else if(o instanceof Double) return true;
 		else return false;
 	}
 
+	/**
+	 * Determines if a given element (String) is a matrix
+	 */
 	private boolean isMatrix(String s) {
 		return (s.equals("A") || s.equals("B"));
 	}
 
+	/**
+	 * Determines if a given element (Object) is a matrix
+	 */
 	private boolean isMatrix(Object o) {
 		if(o instanceof String) return isMatrix((String) o);
 		else if(o instanceof Matrix) return true;
 		else return false;
 	}
 
+	/**
+	 * Converts a given object to a Matrix object. Returns null if unable to
+	 */
 	private Matrix toMatrix(Object o) {
 		if(o instanceof String) {
 			if(!isMatrix((String) o)) return null;
@@ -197,6 +243,10 @@ public class ExpressionReader {
 		else return null;
 	}
 
+	/**
+	 * Counts the number of times a given character appears in a 
+	 * given expression
+	 */
 	private static int characterCount(String expr, Character c) {
 		int count = 0;
 		for(Character ch : expr.toCharArray()) if(ch == c) count ++;
